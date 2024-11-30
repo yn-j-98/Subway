@@ -7,7 +7,7 @@ import csv  # CSV 파일 읽기를 위한 라이브러리
 import matplotlib.pyplot as plt  # 그래프 생성을 위한 라이브러리
 
 # CSV 파일 경로 지정
-file_path = "subway.csv"
+file_path = "subway_2023.csv"
 
 # 월별 데이터와 승하차인원수를 저장할 리스트 초기화
 months = []  # 월을 저장할 리스트
@@ -18,7 +18,7 @@ with open(file_path, mode='r') as file:
     reader = csv.reader(file)  # CSV 파일을 읽어올 수 있는 reader 객체 생성
     header = next(reader)  # 첫 번째 줄(헤더)은 건너뛰기
     
-    # CSV 파일의 각 줄을 순회하며 데이터 처리
+    # CSV 파일의 각 줄을 순회하며 데이터 처리 
     for row in reader:
         a = row[-2]  # 수송연월 데이터 (예: "Jan-23")
         b = row[-1]  # 승하차인원수 데이터
