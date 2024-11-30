@@ -1,66 +1,78 @@
-'''
-Created on 2024. 11. 29.
+import csv
+import matplotlib.pyplot as plt
 
-@author: yenaj
-'''
-import csv  # CSV 파일 읽기를 위한 라이브러리
-import matplotlib.pyplot as plt  # 그래프 생성을 위한 라이브러리
+def process_csv(file_path):
+    """
+    주어진 CSV 파일에서 월별 데이터를 처리하여 반환합니다.
+    """
+    data = {}  # {년도: [월별 데이터]}
+    months_order = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-# CSV 파일 경로 지정
-file_path = "subway_2023.csv"
-
-# 월별 데이터와 승하차인원수를 저장할 리스트 초기화
-months = []  # 월을 저장할 리스트
-peoples = []  # 각 월의 승하차인원수를 저장할 리스트
-
-# CSV 파일 열기
-with open(file_path, mode='r') as file:
-    reader = csv.reader(file)  # CSV 파일을 읽어올 수 있는 reader 객체 생성
-    header = next(reader)  # 첫 번째 줄(헤더)은 건너뛰기
-    
-    # CSV 파일의 각 줄을 순회하며 데이터 처리 
-    for row in reader:
-        a = row[-2]  # 수송연월 데이터 (예: "Jan-23")
-        b = row[-1]  # 승하차인원수 데이터
+    with open(file_path, mode='r') as file:
+        reader = csv.reader(file)
+        header = next(reader)  # 헤더 건너뛰기
         
-        # 월 데이터가 처음 등장하면 리스트에 추가
-        if a not in months:
-            months.append(a)  # 중복되지 않게 월 추가
+        for row in reader:
+            year_month = row[-2]  # "Jan-23" 형식
+            people = row[-1]      # 승하차인원수
             
-        # 해당 월의 인덱스를 찾기
-        index = months.index(a)
-        
-        # 해당 월의 데이터를 합산하기 위해 peoples 리스트 크기를 동적으로 조정
-        if len(peoples) <= index:
-            peoples.append(0)  # 새로운 월 데이터를 위한 초기값 추가
-        
-        # 월별 승하차인원수 데이터를 합산
-        peoples[index] += int(b)  # 문자열을 정수로 변환 후 합산
+            # 데이터 유효성 검사
+            if not year_month or '-' not in year_month:
+                print(f"Invalid data skipped: {row}")
+                continue
+            if not people.strip().isdigit():
+                people = "0"
+            
+            # "Jan-23"을 분리하여 연도와 월로 나누기
+            try:
+                month, year_suffix = year_month.split('-')
+                year = "20" + year_suffix  # "23" -> "2023"
+            except ValueError:
+                print(f"Skipping row due to format error: {row}")
+                continue
+            
+            # 연도별로 데이터를 저장
+            if year not in data:
+                data[year] = [0] * 12  # 12개월 초기화
+            
+            # 월에 해당하는 인덱스 계산
+            if month in months_order:
+                month_index = months_order.index(month)
+                data[year][month_index] += int(people)
+            else:
+                print(f"Skipping invalid month: {month}")
+    return data
 
-# 그래프 크기 설정
-plt.figure(figsize=(10, 6))  # 가로 10, 세로 6 크기의 그래프 생성
+# CSV 파일 경로
+file_paths = ["subway_2019.csv", "subway_2020.csv", "subway_2021.csv", "subway_2022.csv", "subway_2023.csv"]
 
-# 막대그래프 생성
-plt.bar(months, peoples, color='skyblue')  # X축: months, Y축: peoples, 색상: 하늘색
+# 모든 데이터를 저장할 딕셔너리 초기화
+all_data = {}
 
-# 그래프 제목 및 축 레이블 설정
-plt.title("Monthly Subway Ridership", fontsize=15)  # 그래프 제목
-plt.xlabel("Month", fontsize=12)  # X축 레이블
-plt.ylabel("People", fontsize=12)  # Y축 레이블
+# 각 파일 처리
+for file_path in file_paths:
+    yearly_data = process_csv(file_path)
+    all_data.update(yearly_data)
 
-# 각 막대 위에 승하차인원수를 표시
-for i, v in enumerate(peoples):  
-    plt.text(i, v + 50000, f"{v:,}", ha='center', fontsize=9)  
-    # i: X축 위치, v: Y축 값, `f"{v:,}"`: 천 단위 콤마 추가, ha='center': 텍스트 중앙 정렬
+# x축 (월) 정의
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-# X축 레이블을 기울여서 겹치지 않게 표시
+# 그래프 그리기
+plt.figure(figsize=(12, 6))
+
+for year, monthly_data in sorted(all_data.items()):
+    plt.plot(months, monthly_data, marker='o', label=f"{year}")  # 연도별 선 그래프
+
+# 그래프 설정
+plt.title("Monthly Subway Ridership (2019 - 2023)", fontsize=16)
+plt.xlabel("Month", fontsize=12)
+plt.ylabel("People", fontsize=12)
 plt.xticks(rotation=45)
-
-# 그래프 레이아웃 자동 조정
-plt.tight_layout()
+plt.legend(title="Year")
+plt.grid(True, linestyle='--', alpha=0.6)
 
 # 그래프 표시
+plt.tight_layout()
 plt.show()
-            
-            
-            
