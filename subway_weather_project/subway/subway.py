@@ -10,7 +10,7 @@ def process_csv(file_path):
     months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-    with open(file_path, mode='r', encoding='utf-8') as file:
+    with open(file_path, mode='r', encoding='ANSI') as file:
         reader = csv.reader(file)
         header = next(reader)  # 헤더 건너뛰기
 
