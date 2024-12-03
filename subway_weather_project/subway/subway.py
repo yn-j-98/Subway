@@ -1,7 +1,7 @@
 import csv
 
 import matplotlib.pyplot as plt
-import seaborn as sns       # 고급화된 그래프
+
 
 def process_csv(file_path):
     """
