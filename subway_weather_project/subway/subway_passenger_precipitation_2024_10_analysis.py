@@ -83,8 +83,8 @@ def plot_ridership_vs_precipitation(merged_data):
         ax1.set_ylabel('승차 + 하차 총 승객수', color='black')
         ax1.tick_params(axis='y', labelcolor='black')
         
-        # 승하차 총 승객수 범위를 10만부터 시작하도록 설정
-        ax1.set_ylim(bottom=100000)  # Y축 최소값을 100,000으로 설정
+        # 승하차 총 승객수 범위를 10만부터 30만까지 설정
+        ax1.set_ylim(100000, 300000)  # Y축 범위를 100,000 ~ 300,000으로 설정
 
         ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교 (24년 10월)')
 
@@ -93,6 +93,9 @@ def plot_ridership_vs_precipitation(merged_data):
         ax2.plot(merged_data['사용일자'], merged_data['강수량(mm)'], color='#228B22', label='강수량(mm)', linestyle='-', marker='o')  # 시원한 초록색
         ax2.set_ylabel('강수량(mm)', color='#228B22')
         ax2.tick_params(axis='y', labelcolor='#228B22')
+
+        # 강수량 Y축 범위 설정
+        ax2.set_ylim(0, 50)  # Y축 범위를 0 ~ 50으로 설정
 
         # 그리드, 범례 설정
         ax1.grid(True, linestyle='--', alpha=0.7)  # 그리드 선을 점선으로 설정하고 투명도 설정

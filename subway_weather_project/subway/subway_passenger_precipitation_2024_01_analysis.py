@@ -69,37 +69,39 @@ def merge_data(subway_df, precipitation_df):
         print(f"Error merging data: {e}")
         return None
 
-# 그래프를 그려주는 함수 (예시: 승차 총 승객수 + 하차 총 승객수와 강수량 비교)
+# 그래프를 그려주는 함수 (Y축 범위 조정)
 def plot_ridership_vs_precipitation(merged_data):
     try:
         fig, ax1 = plt.subplots(figsize=(10, 6))
 
-        # 첫 번째 Y축: 승차 총 승객수 + 하차 총 승객수 막대 그래프
+        # 승차 + 하차 총 승객수 계산
         merged_data['승차 + 하차 총 승객수'] = merged_data['승차총승객수'] + merged_data['하차총승객수']
-        ax1.bar(merged_data['사용일자'], merged_data['승차 + 하차 총 승객수'], color='#FFD700', label='승차 + 하차 총 승객수')  # 따뜻한 금색
+
+        # 첫 번째 Y축: 승차 + 하차 총 승객수 (막대 그래프)
+        ax1.bar(merged_data['사용일자'], merged_data['승차 + 하차 총 승객수'], color='#FFD700', label='승차 + 하차 총 승객수')
         ax1.set_xlabel('날짜')
         ax1.set_ylabel('승차 + 하차 총 승객수', color='black')
         ax1.tick_params(axis='y', labelcolor='black')
         
-        # 승하차 총 승객수 범위를 10만부터 시작하도록 설정
-        ax1.set_ylim(bottom=100000)  # Y축 최소값을 100,000으로 설정
+        # 왼쪽 Y축 범위 설정
+        ax1.set_ylim(100000, 300000)
 
-        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교 (24년 1월)')
-
-        # 두 번째 Y축: 강수량 그래프 (직선 그래프)
-        ax2 = ax1.twinx()  # 두 번째 Y축 생성
-        ax2.plot(merged_data['사용일자'], merged_data['강수량(mm)'], color='#228B22', label='강수량(mm)', linestyle='-', marker='o')  # 시원한 초록색
+        # 두 번째 Y축: 강수량(mm) (선 그래프)
+        ax2 = ax1.twinx()
+        ax2.plot(merged_data['사용일자'], merged_data['강수량(mm)'], color='#228B22', label='강수량(mm)', linestyle='-', marker='o')
         ax2.set_ylabel('강수량(mm)', color='#228B22')
         ax2.tick_params(axis='y', labelcolor='#228B22')
-
-        # 그리드, 범례 설정
-        ax1.grid(True, linestyle='--', alpha=0.7)  # 그리드 선을 점선으로 설정하고 투명도 설정
-        fig.tight_layout()
         
-        # 범례 추가
+        # 오른쪽 Y축 범위 설정
+        ax2.set_ylim(0, 50)
+
+        # 그래프 제목 및 기타 설정
+        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교')
+        ax1.grid(True, linestyle='--', alpha=0.7)  # 점선 그리드 설정
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
-        
+
+        plt.tight_layout()
         plt.show()
         print("Plot displayed successfully.")
     except Exception as e:
