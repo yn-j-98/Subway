@@ -13,19 +13,18 @@ def load_precipitation_data(file_path):
     try:
         # ANSI 인코딩으로 로드
         df_precipitation = pd.read_csv(file_path, encoding='ANSI')
-        print(f"Loaded precipitation data with ANSI encoding.")
         
         # 열 이름 확인
         print("강수량 데이터 열 확인:", df_precipitation.columns)
         
-        # 열 이름을 실제 파일에 맞게 수정 (지점 열을 제외한 강수량과 날짜 열만 사용)
+        # 열 이름을 실제 파일에 맞게 설정
         df_precipitation.columns = ['날짜', '지점', '강수량(mm)']
         df_precipitation['날짜'] = pd.to_datetime(df_precipitation['날짜'], format='%Y-%m-%d')  # 날짜 형식 변환
         
         return df_precipitation
     
     except Exception as e:
-        print(f"Error loading precipitation data: {e}")
+        print(f"강수량 데이터 로딩 에러: {e}")
         return None
 
 # 지하철 데이터 로드 함수 (자동 인코딩 감지)
@@ -35,11 +34,10 @@ def load_subway_data(file_path):
         with open(file_path, 'rb') as f:
             result = chardet.detect(f.read())
             encoding = result['encoding']
-            print(f"Detected encoding: {encoding}")
         
         # 자동으로 감지된 인코딩으로 파일을 읽음
         df_subway = pd.read_csv(file_path, encoding=encoding)
-        print(f"Loaded subway data with {encoding} encoding.")
+        print(f"지하철 데이터 인코딩 {encoding} ")
         
         # 열 이름 확인
         print("지하철 데이터 열 확인:", df_subway.columns)
