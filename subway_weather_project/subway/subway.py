@@ -1,75 +1,76 @@
-import csv
-
+import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns       # 고급화된 그래프
 
-def process_csv(file_path):
-    """
-    주어진 CSV 파일에서 2019~2023년 데이터를 처리하여 반환합니다.
-    """
-    data = {year: [0] * 12 for year in range(2019, 2024)}  # 2019~2023년, 12개월 초기화
-    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+# 강수량 데이터 로드 함수
+def load_precipitation_data(file_path):
+    # CSV 파일을 DataFrame으로 로드
+    df_precipitation = pd.read_csv(file_path)
+    
+    # 필요한 데이터만 추출 (날짜와 강수량)
+    df_precipitation = df_precipitation[['날짜', '강수량(mm)']]
+    df_precipitation['날짜'] = pd.to_datetime(df_precipitation['날짜'], format='%Y-%m-%d')  # 날짜 형식 변환
+    
+    return df_precipitation
 
-    with open(file_path, mode='r', encoding='ANSI') as file:
-        reader = csv.reader(file)
-        header = next(reader)  # 헤더 건너뛰기
+# 지하철 데이터 로드 함수
+def load_subway_data(file_path):
+    # CSV 파일을 DataFrame으로 로드
+    df_subway = pd.read_csv(file_path)
+    
+    # 날짜 형식을 맞춰줍니다. (사용일자 -> 날짜 형식)
+    df_subway['사용일자'] = pd.to_datetime(df_subway['사용일자'], format='%Y%m%d')
+    
+    return df_subway
 
-        for row in reader:
-            if len(row) < 5:  # 데이터 길이 확인
-                continue
+# 파일 경로 설정 (예시로 2024년 1월 데이터 사용)
+precipitation_file = 'precipitation_202401.csv'  # 강수량 데이터 (1월)
+subway_file = 'subway_202401.csv'  # 지하철 데이터 (1월)
 
-            year_month = row[-2].strip()  # "Jan-23" 형식
-            people = row[-1].strip()     # 승하차 인원수
+# 데이터 로드
+precipitation_data = load_precipitation_data(precipitation_file)
+subway_data = load_subway_data(subway_file)
 
-            # 데이터 유효성 검사
-            if not people.isdigit():
-                continue
+# 데이터 확인 (강수량 및 지하철 승차 데이터)
+print("강수량 데이터:")
+print(precipitation_data.head())
+print("\n지하철 데이터:")
+print(subway_data.head())
 
-            # "Jan-23"을 분리하여 연도와 월로 나누기
-            try:
-                month, year_suffix = year_month.split('-')
-                year = int("20" + year_suffix)  # "23" -> 2023
-                if year < 2019 or year > 2023:  # 필요한 연도만 처리
-                    continue
+# 날짜를 기준으로 강수량과 지하철 데이터를 병합
+merged_data = pd.merge(subway_data, precipitation_data, left_on='사용일자', right_on='날짜', how='left')
 
-                month_index = months.index(month)  # 월 인덱스 계산
-                data[year][month_index] += int(people)  # 월별 데이터 추가
-            except (ValueError, IndexError):
-                continue  # 형식 오류 처리
+# 병합된 데이터 확인
+print("\n병합된 데이터:")
+print(merged_data.head())
 
-    return data
+# 강수량에 따른 지하철 승차 인원 분석 (scatter plot)
+plt.figure(figsize=(10, 6))
+plt.scatter(merged_data['강수량(mm)'], merged_data['승차총승객수'], alpha=0.5)
+plt.title('강수량에 따른 지하철 승차 인원')
+plt.xlabel('강수량 (mm)')
+plt.ylabel('승차총승객수')
+plt.show()
 
-# CSV 파일 경로
-file_paths = ["subway_2019.csv", "subway_2020.csv", "subway_2021.csv", "subway_2022.csv", "subway_2023.csv"]
+# 다른 월 데이터를 처리할 때는 파일 경로를 변경하여 같은 방식으로 처리 가능
 
-# 모든 데이터를 저장할 딕셔너리 초기화
-all_data = {year: [0] * 12 for year in range(2019, 2024)}
+# 예시: 2024년 4월 데이터 처리
+precipitation_file_april = 'precipitation_202404.csv'
+subway_file_april = 'subway_202404.csv'
 
-# 각 파일 처리
-for file_path in file_paths:
-    yearly_data = process_csv(file_path)
-    for year, monthly_data in yearly_data.items():
-        all_data[year] = [x + y for x, y in zip(all_data[year], monthly_data)]
+precipitation_data_april = load_precipitation_data(precipitation_file_april)
+subway_data_april = load_subway_data(subway_file_april)
 
-# x축 (월) 정의
-months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+# 4월 데이터 병합
+merged_data_april = pd.merge(subway_data_april, precipitation_data_april, left_on='사용일자', right_on='날짜', how='left')
 
-# 그래프 그리기
-plt.figure(figsize=(12, 6))
+# 병합된 데이터 확인
+print("\n2024년 4월 병합된 데이터:")
+print(merged_data_april.head())
 
-for year, monthly_data in sorted(all_data.items()):
-    plt.plot(months, monthly_data, marker='o', label=f"{year}")  # 연도별 선 그래프
-
-# 그래프 설정
-plt.title("Monthly Subway Ridership (2019 - 2023)", fontsize=16)
-plt.xlabel("Month", fontsize=12)
-plt.ylabel("People", fontsize=12)
-plt.xticks(rotation=45)
-plt.legend(title="Year")
-plt.grid(True, linestyle='--', alpha=0.6)
-
-# 그래프 표시
-plt.tight_layout()
+# 강수량에 따른 지하철 승차 인원 분석 (scatter plot for April)
+plt.figure(figsize=(10, 6))
+plt.scatter(merged_data_april['강수량(mm)'], merged_data_april['승차총승객수'], alpha=0.5)
+plt.title('2024년 4월 강수량에 따른 지하철 승차 인원')
+plt.xlabel('강수량 (mm)')
+plt.ylabel('승차총승객수')
 plt.show()
