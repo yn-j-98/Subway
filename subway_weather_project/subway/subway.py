@@ -78,7 +78,7 @@ def plot_ridership_vs_precipitation(merged_data):
 
         # 첫 번째 Y축: 승차 총 승객수 + 하차 총 승객수 막대 그래프
         merged_data['승차 + 하차 총 승객수'] = merged_data['승차총승객수'] + merged_data['하차총승객수']
-        ax1.bar(merged_data['사용일자'], merged_data['승차 + 하차 총 승객수'], color='yellow', label='승차 + 하차 총 승객수')
+        ax1.bar(merged_data['사용일자'], merged_data['승차 + 하차 총 승객수'], color='#FFD700', label='승차 + 하차 총 승객수')  # 따뜻한 금색
         ax1.set_xlabel('날짜')
         ax1.set_ylabel('승차 + 하차 총 승객수', color='black')
         ax1.tick_params(axis='y', labelcolor='black')
@@ -86,17 +86,21 @@ def plot_ridership_vs_precipitation(merged_data):
         # 승하차 총 승객수 범위를 10만부터 시작하도록 설정
         ax1.set_ylim(bottom=100000)  # Y축 최소값을 100,000으로 설정
 
-        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교')
+        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교 (24년 1월)')
 
         # 두 번째 Y축: 강수량 그래프 (직선 그래프)
         ax2 = ax1.twinx()  # 두 번째 Y축 생성
-        ax2.plot(merged_data['사용일자'], merged_data['강수량(mm)'], color='green', label='강수량(mm)', linestyle='-', marker='o')  # 점선 -> 직선으로 변경
-        ax2.set_ylabel('강수량(mm)', color='green')
-        ax2.tick_params(axis='y', labelcolor='green')
+        ax2.plot(merged_data['사용일자'], merged_data['강수량(mm)'], color='#228B22', label='강수량(mm)', linestyle='-', marker='o')  # 시원한 초록색
+        ax2.set_ylabel('강수량(mm)', color='#228B22')
+        ax2.tick_params(axis='y', labelcolor='#228B22')
 
         # 그리드, 범례 설정
-        ax1.grid(True)
+        ax1.grid(True, linestyle='--', alpha=0.7)  # 그리드 선을 점선으로 설정하고 투명도 설정
         fig.tight_layout()
+        
+        # 범례 추가
+        ax1.legend(loc='upper left')
+        ax2.legend(loc='upper right')
         
         plt.show()
         print("Plot displayed successfully.")
