@@ -96,7 +96,7 @@ def plot_ridership_vs_precipitation(merged_data):
         ax2.set_ylim(0, 50)
 
         # 그래프 제목 및 기타 설정
-        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교')
+        ax1.set_title('하루 승차 + 하차 총 승객수와 강수량 비교 (24년 1월)')
         ax1.grid(True, linestyle='--', alpha=0.7)  # 점선 그리드 설정
         ax1.legend(loc='upper left')
         ax2.legend(loc='upper right')
